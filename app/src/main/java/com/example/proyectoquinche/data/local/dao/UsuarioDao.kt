@@ -1,32 +1,44 @@
 package com.example.proyectoquinche.data.local.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
+import androidx.room.Upsert
 import com.example.proyectoquinche.data.local.entity.UsuarioEntity
-import com.example.proyectoquinche.domain.enums.SyncStatus
+import com.example.proyectoquinche.data.local.relation.CuentaUsuario
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UsuarioDao {
 
-    @Query("SELECT * FROM usuarios WHERE activo = 1 ORDER BY nombreCompleto ASC")
-    fun observeActivos(): Flow<List<UsuarioEntity>>
+    @Query(
+        """
+        SELECT u.usuario_id AS usuarioId, u.persona_id AS personaId, u.nombre_usuario AS nombreUsuario,
+               u.clave_hash AS claveHash, u.activo, r.nombre AS rolNombre, p.nombres, p.apellidos
+        FROM usuario u
+        JOIN rol r ON r.rol_id = u.rol_id
+        JOIN persona p ON p.persona_id = u.persona_id
+        WHERE u.nombre_usuario = :nombreUsuario COLLATE NOCASE
+        LIMIT 1
+        """
+    )
+    suspend fun getCuenta(nombreUsuario: String): CuentaUsuario?
 
-    @Query("SELECT * FROM usuarios WHERE id = :id LIMIT 1")
-    suspend fun getById(id: Long): UsuarioEntity?
+    @Query(
+        """
+        SELECT u.usuario_id AS usuarioId, u.persona_id AS personaId, u.nombre_usuario AS nombreUsuario,
+               u.clave_hash AS claveHash, u.activo, r.nombre AS rolNombre, p.nombres, p.apellidos
+        FROM usuario u
+        JOIN rol r ON r.rol_id = u.rol_id
+        JOIN persona p ON p.persona_id = u.persona_id
+        WHERE u.usuario_id = :usuarioId
+        LIMIT 1
+        """
+    )
+    fun observeCuenta(usuarioId: String): Flow<CuentaUsuario?>
 
-    @Query("SELECT * FROM usuarios WHERE username = :username LIMIT 1")
-    suspend fun getByUsername(username: String): UsuarioEntity?
+    @Query("SELECT COUNT(*) FROM usuario")
+    suspend fun count(): Int
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(usuario: UsuarioEntity): Long
-
-    @Update
-    suspend fun update(usuario: UsuarioEntity)
-
-    @Query("SELECT * FROM usuarios WHERE syncStatus IN (:statuses)")
-    suspend fun getBySyncStatuses(statuses: List<SyncStatus>): List<UsuarioEntity>
+    @Upsert
+    suspend fun upsertAll(usuarios: List<UsuarioEntity>)
 }

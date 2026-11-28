@@ -16,7 +16,7 @@ interface AsistenciaDao {
     fun observePorFecha(fechaEpochDay: Long): Flow<List<AsistenciaEntity>>
 
     @Query("SELECT * FROM asistencias WHERE comuneroId = :comuneroId ORDER BY fechaEpochDay DESC")
-    fun observePorComunero(comuneroId: Long): Flow<List<AsistenciaEntity>>
+    fun observePorComunero(comuneroId: String): Flow<List<AsistenciaEntity>>
 
     @Query("SELECT * FROM asistencias WHERE id = :id LIMIT 1")
     suspend fun getById(id: Long): AsistenciaEntity?

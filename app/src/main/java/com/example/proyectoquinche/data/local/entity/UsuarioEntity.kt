@@ -1,25 +1,46 @@
 package com.example.proyectoquinche.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.example.proyectoquinche.domain.enums.SyncStatus
-import com.example.proyectoquinche.domain.enums.UserRole
-import com.example.proyectoquinche.domain.model.Syncable
 
+/**
+ * Tabla USUARIO. Se descarga del servidor (con clave_hash) para poder
+ * validar credenciales sin Internet.
+ */
 @Entity(
-    tableName = "usuarios",
-    indices = [Index(value = ["username"], unique = true)]
+    tableName = "usuario",
+    foreignKeys = [
+        ForeignKey(
+            entity = PersonaEntity::class,
+            parentColumns = ["persona_id"],
+            childColumns = ["persona_id"]
+        ),
+        ForeignKey(
+            entity = RolEntity::class,
+            parentColumns = ["rol_id"],
+            childColumns = ["rol_id"]
+        )
+    ],
+    indices = [
+        Index(value = ["persona_id"], unique = true),
+        Index(value = ["rol_id"]),
+        Index(value = ["nombre_usuario"], unique = true)
+    ]
 )
 data class UsuarioEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
-    val username: String,
-    val nombreCompleto: String,
-    val rol: UserRole,
-    val pinHash: String,
-    val activo: Boolean = true,
-    override val syncStatus: SyncStatus = SyncStatus.PENDING,
-    override val updatedAt: Long = System.currentTimeMillis(),
-    override val remoteId: String? = null
-) : Syncable
+    @PrimaryKey
+    @ColumnInfo(name = "usuario_id")
+    val usuarioId: String,
+    @ColumnInfo(name = "persona_id")
+    val personaId: String,
+    @ColumnInfo(name = "rol_id")
+    val rolId: Int,
+    @ColumnInfo(name = "nombre_usuario")
+    val nombreUsuario: String,
+    @ColumnInfo(name = "clave_hash")
+    val claveHash: String,
+    val activo: Boolean
+)

@@ -16,7 +16,7 @@ interface MultaDao {
     fun observeTodas(): Flow<List<MultaEntity>>
 
     @Query("SELECT * FROM multas WHERE comuneroId = :comuneroId ORDER BY fechaEpochDay DESC")
-    fun observePorComunero(comuneroId: Long): Flow<List<MultaEntity>>
+    fun observePorComunero(comuneroId: String): Flow<List<MultaEntity>>
 
     @Query("SELECT * FROM multas WHERE pagada = 0 ORDER BY fechaEpochDay DESC")
     fun observePendientes(): Flow<List<MultaEntity>>

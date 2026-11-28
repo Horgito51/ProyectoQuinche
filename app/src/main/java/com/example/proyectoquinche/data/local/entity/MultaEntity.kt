@@ -12,7 +12,7 @@ import com.example.proyectoquinche.domain.model.Syncable
     foreignKeys = [
         ForeignKey(
             entity = ComuneroEntity::class,
-            parentColumns = ["id"],
+            parentColumns = ["comunero_id"],
             childColumns = ["comuneroId"],
             onDelete = ForeignKey.CASCADE
         )
@@ -22,7 +22,7 @@ import com.example.proyectoquinche.domain.model.Syncable
 data class MultaEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val comuneroId: Long,
+    val comuneroId: String,
     val motivo: String,
     val monto: Double,
     val fechaEpochDay: Long,
